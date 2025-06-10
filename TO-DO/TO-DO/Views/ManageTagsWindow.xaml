@@ -1,0 +1,29 @@
+﻿<Window x:Class="TO_DO.Views.ManageTagsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Управление тегами" Height="300" Width="400"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="10">
+        <TextBox Text="{Binding NewTagName, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="0 0 0 10" />
+        <Button Content="Добавить тег" 
+                Command="{Binding AddTagCommand}" 
+                Width="120" 
+                Margin="0 0 0 10" />
+
+        <ListBox ItemsSource="{Binding Tags}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel Margin="4">
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                        <Button Content="Удалить" 
+                                Command="{Binding DataContext.DeleteTagCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
+                                CommandParameter="{Binding}" 
+                                DockPanel.Dock="Right" 
+                                Width="60" />
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </StackPanel>
+</Window>
