@@ -5,27 +5,20 @@ using System.Windows.Data;
 
 namespace TO_DO.Converters
 {
-	public class TagCheckConverter : IValueConverter
+	public class TagCheckConverter : IMultiValueConverter
 	{
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			if (value is ObservableCollection<int> selectedIds && parameter is int tagId)
-				return selectedIds.Contains(tagId);
-			return false;
-		}
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length != 2 || values[0] is not ObservableCollection<int> selectedIds || values[1] is not int tagId)
+                return false;
 
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-		{
-			if (value is bool isChecked && parameter is int tagId && targetType == typeof(ObservableCollection<int>))
-			{
-				var collection = new ObservableCollection<int>();
-				if (isChecked)
-					collection.Add(tagId);
-				else
-					collection.Remove(tagId);
-				return collection;
-			}
-			return Binding.DoNothing;
-		}
-	}
+            return selectedIds.Contains(tagId);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            // Не нужно реализовывать, управление через VM
+            return new object[] { Binding.DoNothing, Binding.DoNothing };
+        }
+    }
 }
