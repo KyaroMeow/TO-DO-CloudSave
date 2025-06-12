@@ -1,11 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
-using TO_DO.Models;
-using System.Windows;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Data.Sqlite;
+using System.Collections.ObjectModel;
+using System.Windows;
 using TO_DO.Data;
 using TO_DO.Enums;
+using TO_DO.Models;
+using TO_DO.Services;
+using BaseTheme = MaterialDesignThemes.Wpf.BaseTheme;
+using MaterialThemeHelper = MaterialDesignThemes.Wpf.PaletteHelper;
+
 
 namespace TO_DO.ViewModels
 {
@@ -13,7 +18,8 @@ namespace TO_DO.ViewModels
 	{
 		public MainViewModel()
 		{
-			//LoadTasks();
+			ApplyTheme();
+			LoadTasks();
 		}
 		private readonly DbRepository _repo = new("Data Source=TaskBase.db;Pooling=True;Cache=Shared");
 
@@ -23,6 +29,8 @@ namespace TO_DO.ViewModels
 		private string? searchQuery;
 		[ObservableProperty]
 		private TaskFilter selectedFilter = TaskFilter.All;
+		public IEnumerable<TaskModel> ActiveTasks => Tasks.Where(t => !t.IsCompleted);
+		public IEnumerable<TaskModel> CompletedTasks => Tasks.Where(t => t.IsCompleted);
 
 
 		public IEnumerable<TaskModel> FilteredTasks =>
@@ -79,21 +87,21 @@ namespace TO_DO.ViewModels
 			}
 		}
 
-        [RelayCommand]
-        private void EditTask(TaskModel? task)
-        {
-            if (task is null)
-                return;
+		[RelayCommand]
+		private void EditTask(TaskModel? task)
+		{
+			if (task is null)
+				return;
 
-            var vm = new EditTaskViewModel(task, LoadTasks);
-            var window = new Views.EditTaskWindow(task, vm)
-            {
-                Owner = Application.Current.MainWindow
-            };
+			var vm = new EditTaskViewModel(task, LoadTasks);
+			var window = new Views.EditTaskWindow(task, vm)
+			{
+				Owner = Application.Current.MainWindow
+			};
 
-            window.ShowDialog(); // изменения уже реактивны
-        }
-        [RelayCommand]
+			window.ShowDialog(); // изменения уже реактивны
+		}
+		[RelayCommand]
 		private void OpenTagsManager()
 		{
 			var window = new Views.ManageTagsWindow
@@ -104,6 +112,60 @@ namespace TO_DO.ViewModels
 
 			// после закрытия — можно перезагрузить задачи, чтобы обновить теги
 			LoadTasks();
+		}
+
+		public void MoveTask(TaskModel from, TaskModel to)
+		{
+			int oldIndex = Tasks.IndexOf(from);
+			int newIndex = Tasks.IndexOf(to);
+
+			if (oldIndex >= 0 && newIndex >= 0 && oldIndex != newIndex)
+			{
+				Tasks.Move(oldIndex, newIndex);
+				OnPropertyChanged(nameof(FilteredTasks));
+			}
+			RefreshTasks();
+		}
+		[RelayCommand]
+		private void ToggleTheme()
+		{
+			var paletteHelper = new MaterialThemeHelper();
+			var theme = paletteHelper.GetTheme();
+
+			if (theme.GetBaseTheme() == BaseTheme.Dark)
+			{
+				theme.SetBaseTheme(BaseTheme.Light);
+
+				Properties.Settings.Default["IsDarkTheme"] = false;
+			}
+			else
+			{
+				theme.SetBaseTheme(BaseTheme.Dark);
+				Properties.Settings.Default["IsDarkTheme"] = true;
+			}
+
+			paletteHelper.SetTheme(theme);
+			Properties.Settings.Default.Save();
+		}
+
+
+
+		[RelayCommand]
+		private void Logout()
+		{
+			var auth = new AuthService("to-do-1ad85");
+			auth.Logout();
+			Application.Current.Shutdown(); // или показать LoginWindow
+		}
+		private void ApplyTheme()
+		{
+			var paletteHelper = new MaterialThemeHelper();
+			var theme = paletteHelper.GetTheme();
+
+			var isDark = (bool)(Properties.Settings.Default["IsDarkTheme"] ?? false);
+			theme.SetBaseTheme(isDark ? BaseTheme.Dark : BaseTheme.Light);
+
+			paletteHelper.SetTheme(theme);
 		}
 
 		private void LoadCloudTasks(string userId)
@@ -157,6 +219,12 @@ namespace TO_DO.ViewModels
 					});
 				}
 			}
+			RefreshTasks();
+		}
+		private void RefreshTasks()
+		{
+			OnPropertyChanged(nameof(ActiveTasks));
+			OnPropertyChanged(nameof(CompletedTasks));
 		}
 
 
