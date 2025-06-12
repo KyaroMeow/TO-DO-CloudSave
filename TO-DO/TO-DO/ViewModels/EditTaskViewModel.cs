@@ -3,68 +3,85 @@ using TO_DO.Models;
 using System;
 using System.Collections.ObjectModel;
 using TO_DO.Data;
+using System.Linq;
+using System.ComponentModel;
 
 namespace TO_DO.ViewModels
 {
-	public partial class EditTaskViewModel : ObservableObject
-	{
-		[ObservableProperty]
-		private string? title;
+    public partial class EditTaskViewModel : ObservableObject
+    {
+        private readonly DatabaseMigrator dbMigr = new DatabaseMigrator("Data Source=TaskBase.db", "to-do-1ad85");
+        private readonly DbRepository _repo = new("Data Source=TaskBase.db");
+        private readonly TaskModel _task;
+        private readonly Action? _reload;
 
-		[ObservableProperty]
-		private string? description;
+        public ObservableCollection<TagModel> AllTags { get; set; } = new();
 
-		[ObservableProperty]
-		private DateTime? deadline;
-		public ObservableCollection<TagModel> AllTags { get; set; } = new();
-		public ObservableCollection<int> SelectedTagIds { get; set; } = new();
+        public EditTaskViewModel(TaskModel task, Action? reloadTasks = null)
+        {
+            _task = task;
+            _reload = reloadTasks;
 
+            Title = task.Title;
+            Description = task.Description;
+            Deadline = task.Deadline;
 
+            var tags = _repo.GetAllTags();
+            foreach (var tag in tags)
+            {
+                tag.IsSelected = task.Tags.Any(t => t.Id == tag.Id);
+                tag.PropertyChanged += OnTagChanged;
+                AllTags.Add(tag);
+            }
+        }
 
-		public EditTaskViewModel(TaskModel task)
-		{
-			Title = task.Title;
-			Description = task.Description;
-			Deadline = task.Deadline;
+        [ObservableProperty]
+        private string? title;
 
-			// Загружаем все теги из репозитория
-			var repo = new DbRepository("Data Source=TaskBase.db");
-			var tags = repo.GetAllTags(); // метод напишем ниже
-			foreach (var tag in tags)
-				AllTags.Add(tag);
+        partial void OnTitleChanged(string? value)
+        {
+            _task.Title = value ?? "";
+            _repo.UpdateName(_task.Id, _task.Title);
+            _reload?.Invoke();
+            dbMigr.MigrateDatabaseAsync(App.AuthService.LoadUserId());
+        }
 
-			// Устанавливаем выбранные теги
-			foreach (var tag in task.Tags)
-				SelectedTagIds.Add(tag.Id);
-		}
+        [ObservableProperty]
+        private string? description;
 
-		public void ApplyTags(TaskModel task)
-		{
-			var repo = new DbRepository("Data Source=TaskBase.db");
+        partial void OnDescriptionChanged(string? value)
+        {
+            _task.Description = value;
+            _repo.UpdateDescription(_task.Id, value ?? "");
+            _reload?.Invoke();
+            dbMigr.MigrateDatabaseAsync(App.AuthService.LoadUserId());
+        }
 
-			// Получаем текущие ID в базе
-			var currentTagIds = task.Tags.Select(t => t.Id).ToList();
+        [ObservableProperty]
+        private DateTime? deadline;
 
-			// Новые выбранные теги
-			foreach (var tagId in SelectedTagIds)
-			{
-				if (!currentTagIds.Contains(tagId))
-					repo.AddTagToTask(task.Id, tagId);
-			}
+        partial void OnDeadlineChanged(DateTime? value)
+        {
+            _task.Deadline = value;
+            _repo.UpdateDeadline(_task.Id, value);
+            _reload?.Invoke();
+            dbMigr.MigrateDatabaseAsync(App.AuthService.LoadUserId());
+        }
 
-			// Удалённые теги
-			foreach (var tagId in currentTagIds)
-			{
-				if (!SelectedTagIds.Contains(tagId))
-					repo.RemoveTagFromTask(task.Id, tagId);
-			}
-		}
+        private void OnTagChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (sender is not TagModel tag || e.PropertyName != nameof(TagModel.IsSelected))
+                return;
 
-		public void ApplyChanges(TaskModel task)
-		{
-			task.Title = Title ?? "";
-			task.Description = Description;
-			task.Deadline = Deadline;
-		}
-	}
+            bool alreadyLinked = _task.Tags.Any(t => t.Id == tag.Id);
+
+            if (tag.IsSelected && !alreadyLinked)
+                _repo.AddTagToTask(_task.Id, tag.Id);
+            else if (!tag.IsSelected && alreadyLinked)
+                _repo.RemoveTagFromTask(_task.Id, tag.Id);
+
+            _reload?.Invoke();
+            dbMigr.MigrateDatabaseAsync(App.AuthService.LoadUserId());
+        }
+    }
 }

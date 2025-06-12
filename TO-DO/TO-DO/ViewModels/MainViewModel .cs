@@ -13,7 +13,7 @@ namespace TO_DO.ViewModels
 	{
 		public MainViewModel()
 		{
-			LoadTasks();
+			//LoadTasks();
 		}
 		private readonly DbRepository _repo = new("Data Source=TaskBase.db;Pooling=True;Cache=Shared");
 
@@ -79,32 +79,21 @@ namespace TO_DO.ViewModels
 			}
 		}
 
-		[RelayCommand]
-		private void EditTask(TaskModel? task)
-		{
-			if (task is null)
-				return;
+        [RelayCommand]
+        private void EditTask(TaskModel? task)
+        {
+            if (task is null)
+                return;
 
-			var vm = new EditTaskViewModel(task);
-			var window = new Views.EditTaskWindow(vm)
-			{
-				Owner = Application.Current.MainWindow
-			};
+            var vm = new EditTaskViewModel(task, LoadTasks);
+            var window = new Views.EditTaskWindow(task, vm)
+            {
+                Owner = Application.Current.MainWindow
+            };
 
-			if (window.ShowDialog() == true)
-			{
-				vm.ApplyChanges(task);
-				vm.ApplyTags(task); // 🎯 применяем выбранные теги
-
-				_repo.UpdateName(task.Id, task.Title);
-				_repo.UpdateDescription(task.Id, task.Description ?? "");
-				_repo.UpdateDeadline(task.Id, task.Deadline);
-
-				LoadTasks(); // обновляем
-			}
-
-		}
-		[RelayCommand]
+            window.ShowDialog(); // изменения уже реактивны
+        }
+        [RelayCommand]
 		private void OpenTagsManager()
 		{
 			var window = new Views.ManageTagsWindow
@@ -117,7 +106,12 @@ namespace TO_DO.ViewModels
 			LoadTasks();
 		}
 
-		private void LoadTasks()
+		private void LoadCloudTasks(string userId)
+		{
+
+		}
+
+		public void LoadTasks()
 		{
 			Tasks.Clear();
 
