@@ -10,7 +10,7 @@ namespace TO_DO.ViewModels
 {
     public partial class EditTaskViewModel : ObservableObject
     {
-        private readonly DatabaseMigrator dbMigr = new DatabaseMigrator("Data Source=TaskBase.db", "to-do-1ad85");
+        
         private readonly DbRepository _repo = new("Data Source=TaskBase.db");
         private readonly TaskModel _task;
         private readonly Action? _reload;
@@ -43,7 +43,7 @@ namespace TO_DO.ViewModels
             _task.Title = value ?? "";
             _repo.UpdateName(_task.Id, _task.Title);
             _reload?.Invoke();
-            dbMigr.MigrateDatabaseAsync(App.AuthService.LoadUserId());
+
         }
 
         [ObservableProperty]
@@ -54,7 +54,7 @@ namespace TO_DO.ViewModels
             _task.Description = value;
             _repo.UpdateDescription(_task.Id, value ?? "");
             _reload?.Invoke();
-            dbMigr.MigrateDatabaseAsync(App.AuthService.LoadUserId());
+
         }
 
         [ObservableProperty]
@@ -65,7 +65,7 @@ namespace TO_DO.ViewModels
             _task.Deadline = value;
             _repo.UpdateDeadline(_task.Id, value);
             _reload?.Invoke();
-            dbMigr.MigrateDatabaseAsync(App.AuthService.LoadUserId());
+
         }
 
         private void OnTagChanged(object? sender, PropertyChangedEventArgs e)
@@ -81,7 +81,7 @@ namespace TO_DO.ViewModels
                 _repo.RemoveTagFromTask(_task.Id, tag.Id);
 
             _reload?.Invoke();
-            dbMigr.MigrateDatabaseAsync(App.AuthService.LoadUserId());
+
         }
     }
 }

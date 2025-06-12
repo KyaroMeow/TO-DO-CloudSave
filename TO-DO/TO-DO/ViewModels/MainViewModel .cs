@@ -10,7 +10,7 @@ using TO_DO.Models;
 using TO_DO.Services;
 using BaseTheme = MaterialDesignThemes.Wpf.BaseTheme;
 using MaterialThemeHelper = MaterialDesignThemes.Wpf.PaletteHelper;
-
+using Application = System.Windows.Application;
 
 namespace TO_DO.ViewModels
 {
@@ -19,11 +19,14 @@ namespace TO_DO.ViewModels
 		public MainViewModel()
 		{
 			ApplyTheme();
+			cloudDataManager.SyncFromCloudAsync();
 			LoadTasks();
 		}
 		private readonly DbRepository _repo = new("Data Source=TaskBase.db;Pooling=True;Cache=Shared");
+        private readonly CloudDataManager cloudDataManager = new("Data Source=TaskBase.db", "to-do-1ad85", App.AuthService.LoadUserId());
 
-		[ObservableProperty]
+
+        [ObservableProperty]
 		private string? newTaskTitle;
 		[ObservableProperty]
 		private string? searchQuery;
