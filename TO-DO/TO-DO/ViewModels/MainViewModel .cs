@@ -18,15 +18,14 @@ namespace TO_DO.ViewModels
 	{
 		public MainViewModel()
 		{
-			
 			cloudDataManager.SyncFromCloudAsync();
 			LoadTasks();
 		}
 		private readonly DbRepository _repo = new("Data Source=TaskBase.db;Pooling=True;Cache=Shared");
         private readonly CloudDataManager cloudDataManager = new("Data Source=TaskBase.db", "to-do-1ad85", App.AuthService.LoadUserId());
 		private readonly PaletteHelper _paletteHelper = new();
-
-		[ObservableProperty]
+		private readonly DatabaseMigrator _databaseMigrator = new("Data Source=TaskBase.db", "to-do-1ad85");
+        [ObservableProperty]
 		private string? newTaskTitle;
 		[ObservableProperty]
 		private string? searchQuery;
@@ -55,7 +54,8 @@ namespace TO_DO.ViewModels
 				_repo.CreateTask(NewTaskTitle);
 				LoadTasks();
 				NewTaskTitle = string.Empty;
-			}
+				_databaseMigrator.MigrateToCloudAsync(App.UserId);
+            }
 		}
 
 		[RelayCommand]
@@ -65,7 +65,8 @@ namespace TO_DO.ViewModels
 			{
 				_repo.ToggleIsDone(task.Id);
 				LoadTasks();
-			}
+                _databaseMigrator.MigrateToCloudAsync(App.UserId);
+            }
 		}
 
 
@@ -76,7 +77,8 @@ namespace TO_DO.ViewModels
 			{
 				_repo.DeleteTask(task.Id);
 				LoadTasks();
-			}
+                _databaseMigrator.MigrateToCloudAsync(App.UserId);
+            }
 		}
 
 		[RelayCommand]
@@ -92,7 +94,8 @@ namespace TO_DO.ViewModels
 			};
 
 			window.ShowDialog(); // изменения уже реактивны
-		}
+            _databaseMigrator.MigrateToCloudAsync(App.UserId);
+        }
 		[RelayCommand]
 		private void OpenTagsManager()
 		{
@@ -104,7 +107,8 @@ namespace TO_DO.ViewModels
 
 			// после закрытия — можно перезагрузить задачи, чтобы обновить теги
 			LoadTasks();
-		}
+            _databaseMigrator.MigrateToCloudAsync(App.UserId);
+        }
 
 		public void MoveTask(TaskModel from, TaskModel to)
 		{
