@@ -3,12 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Редактировать задачу"
         Height="350" Width="400"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
     <StackPanel Margin="10">
-        <TextBox Text="{Binding Title}" Margin="0 0 0 10" />
-        <TextBox Text="{Binding Description}" Margin="0 0 0 10" />
-        <DatePicker SelectedDate="{Binding Deadline}" Margin="0 0 0 10" />
+        <TextBox Text="{Binding Title}"
+         materialDesign:HintAssist.Hint="Изменить задачу"
+         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+         Margin="0 0 0 10"/>
+        <TextBox Text="{Binding Description}" materialDesign:HintAssist.Hint="Изменить описание"
+        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+        Margin="0 0 0 10"/>
+        <DatePicker SelectedDate="{Binding Deadline}" materialDesign:HintAssist.Hint="Изменить дату"
+        Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
+        Margin="0 0 0 10"/>
 
         <TextBlock Text="Теги:" FontWeight="Bold" Margin="0 10 0 5"/>
 

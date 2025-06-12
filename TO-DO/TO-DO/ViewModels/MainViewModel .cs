@@ -18,43 +18,32 @@ namespace TO_DO.ViewModels
 	{
 		public MainViewModel()
 		{
-			ApplyTheme();
+			
 			cloudDataManager.SyncFromCloudAsync();
 			LoadTasks();
 		}
 		private readonly DbRepository _repo = new("Data Source=TaskBase.db;Pooling=True;Cache=Shared");
         private readonly CloudDataManager cloudDataManager = new("Data Source=TaskBase.db", "to-do-1ad85", App.AuthService.LoadUserId());
+		private readonly PaletteHelper _paletteHelper = new();
 
-
-        [ObservableProperty]
+		[ObservableProperty]
 		private string? newTaskTitle;
 		[ObservableProperty]
 		private string? searchQuery;
-		[ObservableProperty]
-		private TaskFilter selectedFilter = TaskFilter.All;
-		public IEnumerable<TaskModel> ActiveTasks => Tasks.Where(t => !t.IsCompleted);
-		public IEnumerable<TaskModel> CompletedTasks => Tasks.Where(t => t.IsCompleted);
 
+		public IEnumerable<TaskModel> ActiveTasks =>
+	Tasks.Where(t => !t.IsCompleted && MatchesSearchQuery(t));
 
-		public IEnumerable<TaskModel> FilteredTasks =>
-		Tasks
-		.Where(t =>
-			string.IsNullOrWhiteSpace(SearchQuery) ||
-			t.Title.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
-		.Where(t =>
-			SelectedFilter == TaskFilter.All ||
-			(SelectedFilter == TaskFilter.Active && !t.IsCompleted) ||
-			(SelectedFilter == TaskFilter.Completed && t.IsCompleted));
-
+		public IEnumerable<TaskModel> CompletedTasks =>
+			Tasks.Where(t => t.IsCompleted && MatchesSearchQuery(t));
+		private bool MatchesSearchQuery(TaskModel task) =>
+	string.IsNullOrWhiteSpace(SearchQuery) ||
+	task.Title.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase);
 		partial void OnSearchQueryChanged(string? value)
 		{
-			OnPropertyChanged(nameof(FilteredTasks));
+			OnPropertyChanged(nameof(ActiveTasks));
+			OnPropertyChanged(nameof(CompletedTasks));
 		}
-		partial void OnSelectedFilterChanged(TaskFilter value)
-		{
-			OnPropertyChanged(nameof(FilteredTasks));
-		}
-
 
 		public ObservableCollection<TaskModel> Tasks { get; } = new();
 
@@ -125,33 +114,17 @@ namespace TO_DO.ViewModels
 			if (oldIndex >= 0 && newIndex >= 0 && oldIndex != newIndex)
 			{
 				Tasks.Move(oldIndex, newIndex);
-				OnPropertyChanged(nameof(FilteredTasks));
 			}
-			RefreshTasks();
+			OnPropertyChanged(nameof(Tasks));
+			OnPropertyChanged(nameof(ActiveTasks));
+			OnPropertyChanged(nameof(CompletedTasks));
 		}
 		[RelayCommand]
 		private void ToggleTheme()
 		{
-			var paletteHelper = new MaterialThemeHelper();
-			var theme = paletteHelper.GetTheme();
-
-			if (theme.GetBaseTheme() == BaseTheme.Dark)
-			{
-				theme.SetBaseTheme(BaseTheme.Light);
-
-				Properties.Settings.Default["IsDarkTheme"] = false;
-			}
-			else
-			{
-				theme.SetBaseTheme(BaseTheme.Dark);
-				Properties.Settings.Default["IsDarkTheme"] = true;
-			}
-
-			paletteHelper.SetTheme(theme);
-			Properties.Settings.Default.Save();
+			bool isDark = !(bool)(Properties.Settings.Default["IsDarkTheme"] ?? false);
+			ApplyTheme(isDark);
 		}
-
-
 
 		[RelayCommand]
 		private void Logout()
@@ -160,20 +133,13 @@ namespace TO_DO.ViewModels
 			auth.Logout();
 			Application.Current.Shutdown(); // или показать LoginWindow
 		}
-		private void ApplyTheme()
+		public void ApplyTheme(bool isDark)
 		{
-			var paletteHelper = new MaterialThemeHelper();
-			var theme = paletteHelper.GetTheme();
-
-			var isDark = (bool)(Properties.Settings.Default["IsDarkTheme"] ?? false);
+			var theme = _paletteHelper.GetTheme();
 			theme.SetBaseTheme(isDark ? BaseTheme.Dark : BaseTheme.Light);
-
-			paletteHelper.SetTheme(theme);
-		}
-
-		private void LoadCloudTasks(string userId)
-		{
-
+			_paletteHelper.SetTheme(theme);
+			Properties.Settings.Default["IsDarkTheme"] = isDark;
+			Properties.Settings.Default.Save();
 		}
 
 		public void LoadTasks()
@@ -222,14 +188,9 @@ namespace TO_DO.ViewModels
 					});
 				}
 			}
-			RefreshTasks();
-		}
-		private void RefreshTasks()
-		{
+			OnPropertyChanged(nameof(Tasks));
 			OnPropertyChanged(nameof(ActiveTasks));
 			OnPropertyChanged(nameof(CompletedTasks));
 		}
-
-
 	}
 }

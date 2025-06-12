@@ -11,12 +11,16 @@
     <DockPanel Margin="10">
         <!-- Верхняя панель с кнопками -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 0 10">
-            <Button Content="Сменить тему"
+            <Button
                     Command="{Binding ToggleThemeCommand}"
-                    Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0 0 10 0"/>
-            <Button Content="Выйти"
+                    Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0 0 10 0">
+                <materialDesign:PackIcon Kind="ThemeLightDark"/>
+            </Button>
+            <Button 
                     Command="{Binding LogoutCommand}"
-                    Style="{StaticResource MaterialDesignOutlinedButton}"/>
+                    Style="{StaticResource MaterialDesignOutlinedButton}">
+                <materialDesign:PackIcon Kind="Logout"/>
+            </Button>
         </StackPanel>
 
         <StackPanel DockPanel.Dock="Top" Margin="0 0 0 10">
@@ -26,19 +30,11 @@
                      Margin="0 0 0 10"/>
             <Button Content="Добавить" Command="{Binding AddTaskCommand}"
                     Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0 0 0 20"/>
+                
             <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
                      materialDesign:HintAssist.Hint="Поиск"
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                      Margin="0 0 0 10"/>
-            <ComboBox SelectedItem="{Binding SelectedFilter}" Margin="0 0 0 10" Width="150">
-                <ComboBox.ItemsSource>
-                    <x:Array Type="{x:Type enums:TaskFilter}">
-                        <enums:TaskFilter>All</enums:TaskFilter>
-                        <enums:TaskFilter>Active</enums:TaskFilter>
-                        <enums:TaskFilter>Completed</enums:TaskFilter>
-                    </x:Array>
-                </ComboBox.ItemsSource>
-            </ComboBox>
             <Button Content="Управление тегами" 
                     Command="{Binding OpenTagsManagerCommand}" 
                     Style="{StaticResource MaterialDesignOutlinedButton}"
@@ -54,31 +50,44 @@
 
             <!-- Активные -->
             <StackPanel Grid.Column="0" Margin="5">
-                <TextBlock Text="Активные задачи" FontWeight="Bold" Margin="0 0 0 10"/>
-                <ScrollViewer Height="300">
+                <TextBlock Text="Активные задачи" 
+               FontWeight="Bold" 
+               FontSize="16"
+               Margin="0 0 0 10"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
                     <ListBox x:Name="ActiveListBox"
-                             ItemsSource="{Binding ActiveTasks}"
-                             PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
-                             MouseMove="ListBox_MouseMove"
-                             Drop="ActiveListBox_Drop"
-                             AllowDrop="True"
-                             BorderThickness="0">
+                 ItemsSource="{Binding ActiveTasks}"
+                 PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
+                 MouseMove="ListBox_MouseMove"
+                 Drop="ActiveListBox_Drop"
+                 AllowDrop="True"
+                 BorderThickness="0" DragOver="ListBox_DragOver">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <DockPanel Margin="5">
-                                    <CheckBox Content="{Binding Title}"
-                                              IsChecked="{Binding IsCompleted}"
-                                              Command="{Binding DataContext.ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                              CommandParameter="{Binding}" />
-                                    <Button Content="✏"
-                                            Command="{Binding DataContext.EditTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                            CommandParameter="{Binding}"
-                                            Margin="5 0"/>
-                                    <Button Content="❌"
-                                            Command="{Binding DataContext.RemoveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                            CommandParameter="{Binding}"
-                                            Margin="5 0"/>
-                                </DockPanel>
+                                <Border Margin="4" Padding="8" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4" >
+                                    <DockPanel>
+                                        <CheckBox Content="{Binding Title}"
+                                      IsChecked="{Binding IsCompleted}"
+                                      VerticalAlignment="Center"
+                                      Command="{Binding DataContext.ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                      CommandParameter="{Binding}" />
+                                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                            <Button Style="{StaticResource MaterialDesignToolButton}"
+                                        Command="{Binding DataContext.EditTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
+                                        Margin="4 0">
+                                                <materialDesign:PackIcon Kind="Pencil"/>
+                                            </Button>
+                                            <Button
+                                        Style="{StaticResource MaterialDesignToolButton}"
+                                        Command="{Binding DataContext.RemoveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
+                                        Margin="4 0">
+                                                <materialDesign:PackIcon Kind="Delete"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
@@ -87,31 +96,40 @@
 
             <!-- Выполненные -->
             <StackPanel Grid.Column="1" Margin="5">
-                <TextBlock Text="Выполненные задачи" FontWeight="Bold" Margin="0 0 0 10"/>
-                <ScrollViewer Height="300">
+                <TextBlock Text="Выполненные задачи" FontWeight="Bold" 
+                FontSize="16"
+                Margin="0 0 0 10"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
                     <ListBox x:Name="CompletedListBox"
                              ItemsSource="{Binding CompletedTasks}"
-                             PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
-                             MouseMove="ListBox_MouseMove"
-                             Drop="CompletedListBox_Drop"
-                             AllowDrop="True"
-                             BorderThickness="0">
+                              PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
+                                 MouseMove="ListBox_MouseMove"
+                                 Drop="CompletedListBox_Drop"
+                                 AllowDrop="True"
+                                 BorderThickness="0" DragOver="ListBox_DragOver">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <DockPanel Margin="5">
-                                    <CheckBox Content="{Binding Title}"
-                                              IsChecked="{Binding IsCompleted}"
-                                              Command="{Binding DataContext.ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                              CommandParameter="{Binding}" />
-                                    <Button Content="✏"
+                                <Border Margin="4" Padding="8" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4" >
+                                    <DockPanel>
+                                          <CheckBox Content="{Binding Title}"
+                                        IsChecked="{Binding IsCompleted}"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding DataContext.ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}" />
+                                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                            <Button Content="✏"
+                                            Style="{StaticResource MaterialDesignToolButton}"
                                             Command="{Binding DataContext.EditTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                             CommandParameter="{Binding}"
-                                            Margin="5 0"/>
-                                    <Button Content="❌"
+                                            Margin="4 0"/>
+                                            <Button Content="❌"
+                                            Style="{StaticResource MaterialDesignToolButton}"
                                             Command="{Binding DataContext.RemoveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                             CommandParameter="{Binding}"
-                                            Margin="5 0"/>
-                                </DockPanel>
+                                            Margin="4 0"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>

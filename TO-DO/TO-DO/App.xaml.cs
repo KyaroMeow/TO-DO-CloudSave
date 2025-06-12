@@ -9,22 +9,32 @@ namespace TO_DO
 	{
         public static string UserId { get; private set; } = "";
         public static AuthService AuthService;
-        protected override void OnStartup(StartupEventArgs e)
+		protected override void OnStartup(StartupEventArgs e)
 		{
-            AuthService = new AuthService("to-do-1ad85");
-            Batteries.Init(); // Инициализация SQLitePCLRaw
-            UserId = AuthService.LoadUserId();
-            base.OnStartup(e);
-            if (string.IsNullOrWhiteSpace(UserId))
-            {
-                var login = new Views.LoginView();
-                Current.MainWindow = login;
-                login.ShowDialog();
-            }
-           
+			AuthService = new AuthService("to-do-1ad85");
+			Batteries.Init(); // SQLitePCLRaw init
 
-        }
+			UserId = AuthService.LoadUserId();
 
-    }
+			Window window;
+			if (string.IsNullOrWhiteSpace(UserId))
+			{
+				// Открыть окно входа
+				window = new LoginView();
+			}
+			else
+			{
+				// Открыть основное окно
+				window = new MainWindow();
+			}
+
+			window.Show();
+			Current.MainWindow = window;
+
+			base.OnStartup(e);
+		}
+
+
+	}
 
 }

@@ -81,5 +81,6 @@ namespace TO_DO.Views
 
 			return element is ListBoxItem item ? item.DataContext as TaskModel : null;
 		}
+
 	}
 }
