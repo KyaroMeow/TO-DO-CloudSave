@@ -18,10 +18,19 @@ namespace TO_DO.ViewModels
 	{
 		public MainViewModel()
 		{
-			cloudDataManager.SyncFromCloudAsync();
-			LoadTasks();
-		}
-		private readonly DbRepository _repo = new("Data Source=TaskBase.db;Pooling=True;Cache=Shared");
+			InitializeAsync();
+        }
+        private async void InitializeAsync()
+        {
+            await LoadDataAsync();
+        }
+
+        public async Task LoadDataAsync()
+        {
+            await cloudDataManager.SyncFromCloudAsync();
+            LoadTasks();
+        }
+        private readonly DbRepository _repo = new("Data Source=TaskBase.db;Pooling=True;Cache=Shared");
         private readonly CloudDataManager cloudDataManager = new("Data Source=TaskBase.db", "to-do-1ad85", App.AuthService.LoadUserId());
 		private readonly PaletteHelper _paletteHelper = new();
 		private readonly DatabaseMigrator _databaseMigrator = new("Data Source=TaskBase.db", "to-do-1ad85");
