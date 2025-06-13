@@ -5,7 +5,6 @@ using Microsoft.Data.Sqlite;
 using System.Collections.ObjectModel;
 using System.Windows;
 using TO_DO.Data;
-using TO_DO.Enums;
 using TO_DO.Models;
 using TO_DO.Services;
 using BaseTheme = MaterialDesignThemes.Wpf.BaseTheme;

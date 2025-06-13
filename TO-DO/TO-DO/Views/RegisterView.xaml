@@ -4,7 +4,7 @@
         xmlns:vm="clr-namespace:TO_DO.ViewModels"
         Title="Регистрация" Height="300" Width="400"
         WindowStartupLocation="CenterScreen"
-        Background="{DynamicResource BackgroundBrush}">
+        >
     <Window.DataContext>
         <vm:RegisterViewModel/>
     </Window.DataContext>

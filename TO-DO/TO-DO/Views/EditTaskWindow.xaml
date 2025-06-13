@@ -5,7 +5,7 @@
         Height="350" Width="400"
         WindowStartupLocation="CenterOwner"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Background="{DynamicResource BackgroundBrush}">
+        >
 
     <StackPanel Margin="10">
         <TextBox Text="{Binding Title}"

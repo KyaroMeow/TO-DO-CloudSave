@@ -3,10 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:TO_DO.ViewModels"
         Title="Вход" Height="300" Width="400"
-        WindowStartupLocation="CenterScreen"
-        Background="{DynamicResource BackgroundBrush}">
+        WindowStartupLocation="CenterScreen">
     <Window.DataContext>
-        <vm:LoginViewModel />
+        <vm:LoginViewModel/>
     </Window.DataContext>
 
     <StackPanel Margin="20">
