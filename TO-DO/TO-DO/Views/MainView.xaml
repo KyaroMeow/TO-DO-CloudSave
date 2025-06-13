@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:TO_DO.ViewModels"
              xmlns:enums="clr-namespace:TO_DO.Enums"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Background="{DynamicResource BackgroundBrush}">
     <UserControl.DataContext>
         <vm:MainViewModel/>
     </UserControl.DataContext>
@@ -13,12 +14,12 @@
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 0 0 10">
             <Button
                     Command="{Binding ToggleThemeCommand}"
-                    Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0 0 10 0">
+                   Style="{StaticResource MaterialDesignFlatMidBgButton}" Margin="0 0 10 0">
                 <materialDesign:PackIcon Kind="ThemeLightDark"/>
             </Button>
             <Button 
                     Command="{Binding LogoutCommand}"
-                    Style="{StaticResource MaterialDesignOutlinedButton}">
+                    Style="{StaticResource MaterialDesignFlatMidBgButton}">
                 <materialDesign:PackIcon Kind="Logout"/>
             </Button>
         </StackPanel>
@@ -29,7 +30,7 @@
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                      Margin="0 0 0 10"/>
             <Button Content="Добавить" Command="{Binding AddTaskCommand}"
-                    Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0 0 0 20"/>
+                    Style="{StaticResource MaterialDesignFlatMidBgButton}" Margin="0 0 0 20"/>
                 
             <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
                      materialDesign:HintAssist.Hint="Поиск"
@@ -42,99 +43,100 @@
         </StackPanel>
 
         <!-- Основная область -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <!-- Активные -->
-            <StackPanel Grid.Column="0" Margin="5">
-                <TextBlock Text="Активные задачи" 
-               FontWeight="Bold" 
-               FontSize="16"
-               Margin="0 0 0 10"/>
-                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
-                    <ListBox x:Name="ActiveListBox"
-                 ItemsSource="{Binding ActiveTasks}"
-                 PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
-                 MouseMove="ListBox_MouseMove"
-                 Drop="ActiveListBox_Drop"
-                 AllowDrop="True"
-                 BorderThickness="0" DragOver="ListBox_DragOver">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Margin="4" Padding="8" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4" >
-                                    <DockPanel>
-                                        <CheckBox Content="{Binding Title}"
-                                      IsChecked="{Binding IsCompleted}"
-                                      VerticalAlignment="Center"
-                                      Command="{Binding DataContext.ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                      CommandParameter="{Binding}" />
-                                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                                            <Button Style="{StaticResource MaterialDesignToolButton}"
-                                        Command="{Binding DataContext.EditTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}"
-                                        Margin="4 0">
-                                                <materialDesign:PackIcon Kind="Pencil"/>
-                                            </Button>
-                                            <Button
-                                        Style="{StaticResource MaterialDesignToolButton}"
-                                        Command="{Binding DataContext.RemoveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}"
-                                        Margin="4 0">
-                                                <materialDesign:PackIcon Kind="Delete"/>
-                                            </Button>
-                                        </StackPanel>
-                                    </DockPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </ScrollViewer>
-            </StackPanel>
+                <!-- Активные -->
+                <StackPanel Grid.Column="0" Margin="5">
+                    <TextBlock Text="Активные задачи" 
+               FontWeight="SemiBold" 
+               FontSize="18"
+               Margin="0 0 0 10" Style="{StaticResource MaterialDesignDataGridTextColumnStyle}" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
+                        <ListBox x:Name="ActiveListBox"
+                     ItemsSource="{Binding ActiveTasks}"
+                     PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
+                     MouseMove="ListBox_MouseMove"
+                     Drop="ActiveListBox_Drop"
+                     AllowDrop="True"
+                     BorderThickness="0" DragOver="ListBox_DragOver">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="4" Padding="8" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4" >
+                                        <DockPanel>
+                                            <CheckBox Content="{Binding Title}"
+                                                  IsChecked="{Binding IsCompleted}"
+                                                  VerticalAlignment="Center"
+                                                  Command="{Binding DataContext.ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                  CommandParameter="{Binding}" />
+                                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                                <Button Style="{StaticResource MaterialDesignToolButton}"
+                                                    Command="{Binding DataContext.EditTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                    CommandParameter="{Binding}"
+                                                    Margin="4 0">
+                                                    <materialDesign:PackIcon Kind="Pencil"/>
+                                                </Button>
+                                                <Button Style="{StaticResource MaterialDesignToolButton}"
+                                                    Command="{Binding DataContext.RemoveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                    CommandParameter="{Binding}"
+                                                    Margin="4 0">
+                                                    <materialDesign:PackIcon Kind="Delete"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
+                </StackPanel>
 
-            <!-- Выполненные -->
-            <StackPanel Grid.Column="1" Margin="5">
-                <TextBlock Text="Выполненные задачи" FontWeight="Bold" 
-                FontSize="16"
-                Margin="0 0 0 10"/>
-                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
-                    <ListBox x:Name="CompletedListBox"
+                <!-- Выполненные -->
+                <StackPanel Grid.Column="1" Margin="5">
+                    <TextBlock Text="Выполненные задачи" FontWeight="SemiBold" 
+                FontSize="18"
+                Margin="0 0 0 10" Style="{StaticResource MaterialDesignDataGridTextColumnStyle}"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="400">
+                        <ListBox x:Name="CompletedListBox"
                              ItemsSource="{Binding CompletedTasks}"
                               PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
                                  MouseMove="ListBox_MouseMove"
                                  Drop="CompletedListBox_Drop"
                                  AllowDrop="True"
                                  BorderThickness="0" DragOver="ListBox_DragOver">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Margin="4" Padding="8" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4" >
-                                    <DockPanel>
-                                          <CheckBox Content="{Binding Title}"
-                                        IsChecked="{Binding IsCompleted}"
-                                        VerticalAlignment="Center"
-                                        Command="{Binding DataContext.ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}" />
-                                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                                            <Button Content="✏"
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="4" Padding="8" Background="{DynamicResource MaterialDesignPaper}" CornerRadius="4" >
+                                        <DockPanel>
+                                            <CheckBox Content="{Binding Title}" 
+                                                    IsChecked="{Binding IsCompleted}"
+                                                    VerticalAlignment="Center"
+                                                    Command="{Binding DataContext.ToggleTaskCompletionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                    CommandParameter="{Binding}" />
+                                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                                                <Button Content="✏"
                                             Style="{StaticResource MaterialDesignToolButton}"
                                             Command="{Binding DataContext.EditTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                             CommandParameter="{Binding}"
                                             Margin="4 0"/>
-                                            <Button Content="❌"
+                                                <Button Content="❌"
                                             Style="{StaticResource MaterialDesignToolButton}"
                                             Command="{Binding DataContext.RemoveTaskCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                             CommandParameter="{Binding}"
                                             Margin="4 0"/>
-                                        </StackPanel>
-                                    </DockPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </ScrollViewer>
-            </StackPanel>
-        </Grid>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
     </DockPanel>
 </UserControl>

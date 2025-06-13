@@ -8,9 +8,11 @@
     <ResourceDictionary>
         <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Lime.xaml" />
-                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="Indigo" SecondaryColor="Lime" />
-            </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Indigo.xaml" />
+                </ResourceDictionary.MergedDictionaries>
+             <materialDesign:BundledTheme x:Key="Theme" BaseTheme="Light" PrimaryColor="Blue" SecondaryColor="Indigo"/>
+            <SolidColorBrush x:Key="BackgroundBrush" Color="{DynamicResource MaterialDesignBackground}" />
+            <SolidColorBrush x:Key="CardBrush" Color="{DynamicResource MaterialDesignPaper}" />
+        </ResourceDictionary>
 </Application.Resources>
 </Application>

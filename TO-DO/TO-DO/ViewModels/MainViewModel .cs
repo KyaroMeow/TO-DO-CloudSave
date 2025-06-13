@@ -135,8 +135,14 @@ namespace TO_DO.ViewModels
 		[RelayCommand]
 		private void ToggleTheme()
 		{
-			bool isDark = !(bool)(Properties.Settings.Default["IsDarkTheme"] ?? false);
-			ApplyTheme(isDark);
+			if (Application.Current.Resources["Theme"] is BundledTheme theme)
+			{
+				bool isDark = theme.BaseTheme == BaseTheme.Dark;
+				theme.BaseTheme = isDark ? BaseTheme.Light : BaseTheme.Dark;
+
+				Properties.Settings.Default.IsDarkTheme = !isDark;
+				Properties.Settings.Default.Save();
+			}
 		}
 
 		[RelayCommand]
