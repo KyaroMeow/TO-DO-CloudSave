@@ -60,7 +60,7 @@
   
 - Окно задач 
 
-  <img src = "images/Рисунок3.jpg"/>
+  <img src = "images/Tasks.jpg"/>
 
 # TO-DO CloudSave Application - Техническая документация
 
