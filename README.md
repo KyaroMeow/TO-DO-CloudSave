@@ -56,11 +56,11 @@
 
 - Окно входа 
 
-  <img src = "images/Login.png"/>
+  <img src = "images/Login.jpg"/>
   
 - Окно задач 
 
-  <img src = "images/Рисунок3.png"/>
+  <img src = "images/Рисунок3.jpg"/>
 
 # TO-DO CloudSave Application - Техническая документация
 
